@@ -2,8 +2,11 @@ name: Publish Changed NuGet Packages
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   publish:
@@ -13,33 +16,35 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0   # Tam geçmişi al ki git diff çalışsın
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      - name: Get list of changed projects
+      - name: Get list of changed csproj files
         id: changed-projects
         run: |
-          echo "Finding changed csproj files compared to previous tag..."
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          echo "Previous tag: $PREV_TAG"
-          CHANGED_PROJECTS=$(git diff --name-only $PREV_TAG HEAD | grep '\.csproj$' || true)
-          echo "Changed projects:"
-          echo "$CHANGED_PROJECTS"
-          # Output as newline separated list
-          echo "projects<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGED_PROJECTS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Detecting changed csproj files..."
+          git fetch --prune --unshallow || true
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # PR event: karşılaştırılan branch ile base branch arasındaki fark
+            git diff --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }} | grep '\.csproj$' || true
+          else
+            # Push event: önceki commit ile karşılaştır
+            git diff --name-only HEAD^ HEAD | grep '\.csproj$' || true
+          fi > changed.txt
+
+          echo "::set-output name=projects::$(cat changed.txt | tr '\n' ' ')"
 
       - name: Pack and Push Changed Packages
         if: steps.changed-projects.outputs.projects != ''
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
-          echo "Projects to pack and push:"
+          echo "Changed projects to pack and push:"
           echo "${{ steps.changed-projects.outputs.projects }}"
 
           for proj in ${{ steps.changed-projects.outputs.projects }}
