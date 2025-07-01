@@ -1,0 +1,54 @@
+name: Publish Changed NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0   # Tam geçmişi al ki git diff çalışsın
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Get list of changed projects
+        id: changed-projects
+        run: |
+          echo "Finding changed csproj files compared to previous tag..."
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
+          echo "Previous tag: $PREV_TAG"
+          CHANGED_PROJECTS=$(git diff --name-only $PREV_TAG HEAD | grep '\.csproj$' || true)
+          echo "Changed projects:"
+          echo "$CHANGED_PROJECTS"
+          # Output as newline separated list
+          echo "projects<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_PROJECTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Pack and Push Changed Packages
+        if: steps.changed-projects.outputs.projects != ''
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          echo "Projects to pack and push:"
+          echo "${{ steps.changed-projects.outputs.projects }}"
+
+          for proj in ${{ steps.changed-projects.outputs.projects }}
+          do
+            echo "Packing $proj"
+            dotnet pack "$proj" --configuration Release --no-build --output ./nupkgs
+
+            nupkg_file=$(ls ./nupkgs/*.nupkg | head -n 1)
+            echo "Pushing $nupkg_file"
+            dotnet nuget push "$nupkg_file" --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+            rm ./nupkgs/*.nupkg
+          done
