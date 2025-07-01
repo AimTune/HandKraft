@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<PackageId>HandKraft</PackageId>
+	<Version>0.0.1</Version>
+	<Authors>Hamza Agar</Authors>
+	<Company>Hamza Agar</Company>
+	<Product>HandKraft</Product>
+
+	<Description>Modular .NET toolkit for DDD, Layered Architecture, Clean Architecture, and Hexagonal Architecture.</Description>
+	<PackageTags>ddd;layered-architecture;clean-architecture;hexagonal;dotnet;library</PackageTags>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<RepositoryUrl>https://github.com/AimTune/HandKraft</RepositoryUrl>
+	<PackageProjectUrl>https://github.com/AimTune/HandKraft</PackageProjectUrl>
+	<RepositoryType>git</RepositoryType>
+
+	<PackageIcon>..\..\icon.png</PackageIcon>
+	<PackageReadmeFile>..\..\README.md</PackageReadmeFile>
+
+	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	<IncludeSymbols>true</IncludeSymbols>
+	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+	<Authors>Hamza Agar</Authors>
+
+	<TargetFramework>net9.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>
