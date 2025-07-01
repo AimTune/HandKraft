@@ -2,8 +2,11 @@ name: Publish Changed NuGet Packages
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   publish:
@@ -13,42 +16,53 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0   # Tam geçmişi al ki git diff çalışsın
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '9.0.x'
 
-      - name: Get list of changed projects
+      - name: Get list of changed csproj files
         id: changed-projects
         run: |
-          echo "Finding changed csproj files compared to previous tag..."
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          echo "Previous tag: $PREV_TAG"
-          CHANGED_PROJECTS=$(git diff --name-only $PREV_TAG HEAD | grep '\.csproj$' || true)
-          echo "Changed projects:"
-          echo "$CHANGED_PROJECTS"
-          # Output as newline separated list
-          echo "projects<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGED_PROJECTS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Detecting changed csproj files..."
 
-      - name: Pack and Push Changed Packages
-        if: steps.changed-projects.outputs.projects != ''
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }} | grep '\.csproj$' || true
+          else
+            git diff --name-only HEAD^ HEAD | grep '\.csproj$' || true
+          fi > changed.txt
+
+          PROJECTS=$(cat changed.txt | tr '\n' ' ')
+          echo "Changed projects: $PROJECTS"
+          echo "projects=$PROJECTS" >> $GITHUB_OUTPUT
+
+      - name: Restore, Build, Pack and Push changed projects
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
-          echo "Projects to pack and push:"
-          echo "${{ steps.changed-projects.outputs.projects }}"
+          echo "Projects to process: ${{ steps.changed-projects.outputs.projects }}"
 
           for proj in ${{ steps.changed-projects.outputs.projects }}
           do
+            echo "Restoring $proj"
+            dotnet restore "$proj"
+            
+            echo "Building $proj"
+            dotnet build "$proj" --configuration Release
+            
             echo "Packing $proj"
-            dotnet pack "$proj" --configuration Release --no-build --output ./nupkgs
-
+            dotnet pack "$proj" --configuration Release --output ./nupkgs
+            
             nupkg_file=$(ls ./nupkgs/*.nupkg | head -n 1)
+            if [ -z "$nupkg_file" ]; then
+              echo "No package found for $proj, skipping push"
+              continue
+            fi
+      
             echo "Pushing $nupkg_file"
             dotnet nuget push "$nupkg_file" --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+            
             rm ./nupkgs/*.nupkg
           done
