@@ -23,12 +23,6 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Build solution
-        run: dotnet build --configuration Release --no-restore
-
       - name: Get list of changed csproj files
         id: changed-projects
         run: |
@@ -48,6 +42,8 @@ jobs:
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
         run: |
+          echo "Projects to process: ${{ steps.changed-projects.outputs.projects }}"
+
           for proj in ${{ steps.changed-projects.outputs.projects }}
           do
             echo "Restoring $proj"
