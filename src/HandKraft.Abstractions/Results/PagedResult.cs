@@ -47,6 +47,23 @@ public class PagedResult<TValue> : Result<TValue>
     public int PageSize { get; }
 
     /// <summary>
+    /// Gets the total number of pages calculated based on total count and page size.
+    /// Returns 0 if PageSize is 0.
+    /// </summary>
+    public int TotalPageCount =>
+        PageSize == 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);
+
+    /// <summary>
+    /// Indicates whether there is a next page available.
+    /// </summary>
+    public bool HasNextPage => PageNumber < TotalPageCount;
+
+    /// <summary>
+    /// Gets the number of items to skip for the current page (used in data queries).
+    /// </summary>
+    public int Skip => (PageNumber - 1) * PageSize;
+
+    /// <summary>
     /// Creates a successful paged result.
     /// </summary>
     /// <param name="value">The paged data value.</param>
