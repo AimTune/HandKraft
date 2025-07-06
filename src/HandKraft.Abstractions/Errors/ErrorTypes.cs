@@ -6,6 +6,7 @@
 public enum ErrorTypes
 {
     Failure,
+    Validation,
     NotFound,
     Problem,
     Conflict
