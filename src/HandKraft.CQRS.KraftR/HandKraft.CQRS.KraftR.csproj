@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>HandKraft.CQRS.KraftR</PackageId>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Authors>Hamza Agar</Authors>
     <Company>Hamza Agar</Company>
     <Product>HandKraft</Product>

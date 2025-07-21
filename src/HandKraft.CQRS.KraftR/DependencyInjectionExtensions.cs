@@ -17,30 +17,28 @@ public static class DependencyInjectionExtensions
         // KraftR mediator
         services.AddSingleton<IKraftR, KraftR>();
 
-        List<TypeInfo> allTypes = assemblies.SelectMany(a => a.DefinedTypes).ToList();
+        var allTypes = assemblies.SelectMany(a => a.DefinedTypes).ToList();
 
-        foreach (TypeInfo type in allTypes)
+        foreach (var type in allTypes)
         {
-            // Only consider classes that are not abstract
             if (type.IsClass && !type.IsAbstract)
             {
-                // All implemented interfaces
-                Type[] interfaces = type.GetInterfaces();
+                var interfaces = type.GetInterfaces();
 
-                // Register ICommandHandler<T>
-                IEnumerable<Type> commandHandlerInterfaces = interfaces
-                    .Where(i => i.IsGenericType && (i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)));
+                var commandHandlerInterfaces = interfaces
+                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))
+                    .Distinct();
 
-                foreach (Type iface in commandHandlerInterfaces)
+                foreach (var iface in commandHandlerInterfaces)
                 {
                     services.AddTransient(iface, type.AsType());
                 }
 
-                // Register IQQueryHandler<T>
-                IEnumerable<Type> qqueryHandlerInterfaces = interfaces
-                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQQueryHandler<,>));
+                var queryHandlerInterfaces = interfaces
+                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IQQueryHandler<,>))
+                    .Distinct();
 
-                foreach (Type iface in qqueryHandlerInterfaces)
+                foreach (var iface in queryHandlerInterfaces)
                 {
                     services.AddTransient(iface, type.AsType());
                 }
