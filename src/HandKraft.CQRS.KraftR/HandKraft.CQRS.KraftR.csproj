@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HandKraft.CQRS.Abstractions" Version="0.0.1" />
+    <PackageReference Include="HandKraft.CQRS.Abstractions" Version="0.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.6" />
 
     <None Include="..\..\icon.png" Pack="true" PackagePath="Resources">
