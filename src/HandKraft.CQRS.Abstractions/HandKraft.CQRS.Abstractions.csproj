@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>HandKraft.CQRS.Abstractions</PackageId>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>Hamza Agar</Authors>
     <Company>Hamza Agar</Company>
     <Product>HandKraft</Product>

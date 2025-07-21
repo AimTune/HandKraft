@@ -3,8 +3,8 @@
 namespace HandKraft.Cqrs.Abstractions;
 
 /// <summary>
-/// Mediator interface for sending commands and queries.
-/// Supports async handling of commands, queries, and IQueryable queries.
+/// Mediator interface for sending commands and queries asynchronously.
+/// Supports sending commands/queries and querying IQueryable results.
 /// </summary>
 public interface IKraftR
 {
@@ -39,4 +39,21 @@ public interface IKraftR
     /// <returns>An <see cref="IQueryable{T}"/> representing the query result.</returns>
     IQueryable<T> Query<TQuery, T>(TQuery query, CancellationToken cancellationToken = default)
         where TQuery : IQQuery<T>;
+
+    /// <summary>
+    /// Sends a request and gets the typed response.
+    /// </summary>
+    /// <typeparam name="TResponse">Response type</typeparam>
+    /// <param name="request">Request object</param>
+    /// <param name="cancellationToken">Optional cancellation token</param>
+    /// <returns>The response.</returns>
+    Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sends a request dynamically (type erased).
+    /// </summary>
+    /// <param name="request">Request object.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>The response as object, or null.</returns>
+    Task<object?> Send(object request, CancellationToken cancellationToken = default);
 }
