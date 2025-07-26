@@ -15,7 +15,7 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddKraftR(this IServiceCollection services, params Assembly[] assemblies)
     {
         // KraftR mediator
-        services.AddSingleton<IKraftR, KraftR>();
+        services.AddScoped<IKraftR, KraftR>();
 
         var allTypes = assemblies.SelectMany(a => a.DefinedTypes).ToList();
 
