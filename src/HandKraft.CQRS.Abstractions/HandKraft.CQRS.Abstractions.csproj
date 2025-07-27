@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <PackageId>HandKraft.CQRS.Abstractions</PackageId>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <Authors>Hamza Agar</Authors>
     <Company>Hamza Agar</Company>
     <Product>HandKraft</Product>
@@ -29,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HandKraft.Abstractions" Version="0.0.4" />
+    <PackageReference Include="HandKraft.Abstractions" Version="0.0.5" />
 
     <None Include="..\..\icon.png" Pack="true" PackagePath="Resources">
       <Link>Resources\icon.png</Link>
