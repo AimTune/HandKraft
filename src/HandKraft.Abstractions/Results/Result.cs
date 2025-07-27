@@ -77,14 +77,15 @@ public class Result<TValue>(TValue? value, bool isSuccess, Error error)
     : Result(isSuccess, error)
 {
     /// <summary>
-    /// Gets the value if the result is successful.
-    /// Throws an <see cref="InvalidOperationException"/> if accessed when the result is a failure.
+    /// Gets the value if the result is successful; otherwise returns <c>default</c>.
+    /// Does not throw an exception on failure. Check <see cref="IsSuccess"/> before using the value.
     /// </summary>
-    [NotNull]
-    public TValue Value =>
-        IsSuccess
-            ? value!
-            : throw new InvalidOperationException("The value of a failure result can't be accessed.");
+    public TValue? Value => IsSuccess ? value! : default;
+
+    /// <summary>
+    /// Gets the error details if the result is a failure; otherwise returns <c>null</c>.
+    /// </summary>
+    public Error? ErrorInfo => IsFailure ? Error : null;
 
     /// <summary>
     /// Implicitly converts a value to a successful result.
