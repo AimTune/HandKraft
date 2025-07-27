@@ -12,12 +12,12 @@ public class Result
     /// Initializes a new instance of the <see cref="Result"/> class.
     /// </summary>
     /// <param name="isSuccess">Whether the operation was successful.</param>
-    /// <param name="error">The error details if failed; <see cref="Error.None"/> if successful.</param>
+    /// <param name="error">The error details if failed; <see cref="null"/> if successful.</param>
     /// <exception cref="ArgumentException">Thrown if the combination of success and error is invalid.</exception>
-    public Result(bool isSuccess, Error error)
+    public Result(bool isSuccess, Error? error)
     {
-        if (isSuccess && error != Error.None ||
-            !isSuccess && error == Error.None)
+        if (isSuccess && error != null ||
+            !isSuccess && error == null)
         {
             throw new ArgumentException("Invalid error.", nameof(error));
         }
@@ -37,14 +37,14 @@ public class Result
     public bool IsFailure => !IsSuccess;
 
     /// <summary>
-    /// The error associated with this result, or <see cref="Error.None"/> if successful.
+    /// The error associated with this result, or <see cref="null"/> if successful.
     /// </summary>
-    public Error Error { get; }
+    public Error? Error { get; } 
 
     /// <summary>
     /// Creates a successful result without a value.
     /// </summary>
-    public static Result Success() => new(true, Error.None);
+    public static Result Success() => new(true, null);
 
     /// <summary>
     /// Creates a failed result.
@@ -58,7 +58,7 @@ public class Result
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     public static Result<TValue> Success<TValue>(TValue value) =>
-        new(value, true, Error.None);
+        new(value, true, null);
 
     /// <summary>
     /// Creates a failed result containing a value.
@@ -73,7 +73,7 @@ public class Result
 /// Represents the outcome of an operation that returns a value.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-public class Result<TValue>(TValue? value, bool isSuccess, Error error)
+public class Result<TValue>(TValue? value, bool isSuccess, Error? error)
     : Result(isSuccess, error)
 {
     /// <summary>
@@ -82,10 +82,7 @@ public class Result<TValue>(TValue? value, bool isSuccess, Error error)
     /// </summary>
     public TValue? Value => IsSuccess ? value! : default;
 
-    /// <summary>
-    /// Gets the error details if the result is a failure; otherwise returns <c>null</c>.
-    /// </summary>
-    public Error? ErrorInfo => IsFailure ? Error : null;
+
 
     /// <summary>
     /// Implicitly converts a value to a successful result.
