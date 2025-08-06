@@ -11,7 +11,8 @@ HandKraft provides reusable building blocks including core domain abstractions, 
 
 - [ ] **HandKraft.Abstractions**  
   - Core domain abstractions: Entity, ValueObject, AggregateRoot  
-  - Result pattern, DomainEvent, Exception base types  
+  - Result pattern, DomainEvent, Exception base types 
+  - UnitOfWork and Repository pattern
 
 - [ ] **HandKraft.Cqrs**  
   - CQRS primitives: ICommand, IQuery, Handler interfaces  
